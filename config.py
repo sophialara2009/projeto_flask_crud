@@ -1,7 +1,19 @@
-class Config:
+# config.py
 
+# Configurações do site / aplicativo
+APP = {
     # Nome do site para a tag `<title>...</title>`
-    APP_TITLE = "MyPyPad"
+    'title': 'MyPyPad',
 
     # Nome / logo do site, em HTML, para a tag `.navbar-brand` e outros usos
-    APP_NAME = 'My<i class="bi bi-filetype-py text-warning px-0"></i>Pad'
+    'name': 'My<i class="bi bi-filetype-py text-warning px-0"></i>Pad',
+
+    # Chave secreta
+    'secret_key': '6t4ty483y967t847yt98ut908u2t90yu8y08yu4uy038jgf83bg852',
+}
+
+# Configurações do banco de dados
+DB = {}
+
+# Configurações dos cookies
+COOKIE = {}
