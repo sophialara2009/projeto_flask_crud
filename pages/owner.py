@@ -1,10 +1,12 @@
-# pages\owner.py
+# pages/owner.py
 
 import sqlite3
-from flask import Blueprint, make_response, redirect, request, jsonify, url_for
+from flask import Blueprint, g, make_response, redirect, render_template, request, jsonify, url_for
 from config import COOKIE, DB
+from utils.auth import login_required
 
 owner_bp = Blueprint('owner', __name__, url_prefix='/owner')
+
 
 @owner_bp.route('/login', methods=['POST'])
 def owner_login():
@@ -68,7 +70,8 @@ def owner_login():
     conn.close()
 
     # Cria a resposta JSON
-    response = make_response(jsonify({'message': 'Usuário persistido com sucesso'}), 200)
+    response = make_response(
+        jsonify({'message': 'Usuário persistido com sucesso'}), 200)
 
     # Defina o tempo de vida do cookie em segundos
     max_age = 3600 * 24 * COOKIE['livedays']
@@ -76,7 +79,7 @@ def owner_login():
     # Define o cookie seguro com o UID quando fizer login
     # - secure=True: Envia apenas via HTTPS (em produção; em dev, defina como False se necessário)
     # - httponly=True: Impede acesso via JavaScript (protege contra XSS)
-    # - samesite='Strict': Protege contra CSRF, permitindo apenas do mesmo site    
+    # - samesite='Strict': Protege contra CSRF, permitindo apenas do mesmo site
     response.set_cookie(
         'owner_uid',
         data['uid'],
@@ -87,6 +90,7 @@ def owner_login():
     )
 
     return response
+
 
 @owner_bp.route('/logout', methods=['POST'])
 def owner_logout():
@@ -111,3 +115,17 @@ def owner_logout():
         samesite='Strict'
     )
     return response
+
+
+@owner_bp.route('/profile')
+@login_required
+def owner_profile():
+
+    userdata = g.current_user
+    page_title = f"Perfil de {userdata['own_display_name']}"
+
+    return render_template(
+        "profile.html",
+        page_title=page_title,
+        userdata=userdata
+    )

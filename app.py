@@ -12,10 +12,13 @@ from pages.newpad import newpad_bp
 from pages.search import search_bp
 from pages.owner import owner_bp
 
+from utils.filters import format_datetime_br
+
 app = Flask(__name__)
 
 init_db()
 
+app.jinja_env.filters["datetime_br"] = format_datetime_br
 
 @app.context_processor
 def inject_globals():

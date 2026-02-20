@@ -1,4 +1,4 @@
-# utils\auth.py
+# utils/auth.py
 
 import sqlite3
 from functools import wraps
