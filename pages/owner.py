@@ -11,26 +11,20 @@ owner_bp = Blueprint('owner', __name__, url_prefix='/owner')
 @owner_bp.route('/login', methods=['POST'])
 def owner_login():
 
-    # Recebe os dados do usuário, vindos do front-end, em JSON
     data = request.json
     # print(data)  # Debug - Exibe o JSON que vem do front-end
 
-    # Validação básica dos dados recebidos (ajuste conforme necessário)
     if not data or 'uid' not in data or 'email' not in data or 'createdAt' not in data or 'lastLoginAt' not in data:
         return jsonify({'error': 'Dados incompletos ou inválidos'}), 400
 
-    # Conecta ao banco de dados
     conn = sqlite3.connect(DB['name'])
     cursor = conn.cursor()
 
-    # Verifica se o usuário já existe na tabela owners (baseado no UID do Firebase)
     cursor.execute(
         'SELECT own_id FROM owners WHERE own_uid = ?', (data['uid'],))
-    # True → usuário existe; False = usuário não existe
     existing_user = cursor.fetchone()
 
     if existing_user:
-        # Atualiza os dados existentes (exceto created_at, que permanece o original)
         cursor.execute('''
             UPDATE owners SET
                 own_display_name = ?,
@@ -46,7 +40,6 @@ def owner_login():
             data.get('uid')
         ))
     else:
-        # Insere um novo usuário
         cursor.execute('''
             INSERT INTO owners (
                 own_uid, 
@@ -69,11 +62,9 @@ def owner_login():
     conn.commit()
     conn.close()
 
-    # Cria a resposta JSON
     response = make_response(
         jsonify({'message': 'Usuário persistido com sucesso'}), 200)
 
-    # Defina o tempo de vida do cookie em segundos
     max_age = 3600 * 24 * COOKIE['livedays']
 
     # Define o cookie seguro com o UID quando fizer login

@@ -19,7 +19,7 @@
                 <span class="pe-1" data-bs-toggle="popover" data-bs-trigger="hover" data-bs-content="Texto Plano"><i class="bi bi-file-text-fill"></i></span>
                 {% endif %}
                 <a href="/view/{{ pad.pad_id }}" class="text-decoration-none fw-bold" data-bs-toggle="popover" data-bs-trigger="hover" data-bs-content="{{ pad.pad_title }}">
-                    {{ pad.pad_title | truncate(length=25, killwords=False) }}
+                    {{ pad.pad_title | truncate(25) }}
                 </a>
             </div>
             <div class="card-body d-flex flex-column">

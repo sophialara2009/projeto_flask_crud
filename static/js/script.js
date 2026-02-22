@@ -133,6 +133,8 @@ const googleLogout = async () => {
     }
 };
 
+window.googleLogout = googleLogout;
+
 // Função de Manipulação de Clique (Login/Página de Perfil)
 const handleUserInOutClick = (event) => {
     // Evita que o <a> navegue imediatamente, pois vamos gerenciar isso no JavaScript
@@ -373,13 +375,6 @@ addEventListener('DOMContentLoaded', () => {
     }
 });
 
-// Listener para o botão de confirmação no modal (adicione isso fora da função, no final do script.js)
-document.getElementById('confirmLogoutBtn').addEventListener('click', () => {
-    googleLogout();
-    const logoutModal = bootstrap.Modal.getInstance(document.getElementById('logoutModal'));
-    logoutModal.hide();
-});
-
 // Listener para o estado de autenticação
 // Este listener é executado sempre que o estado de autenticação do usuário muda.
 auth.onAuthStateChanged((user) => {
@@ -406,3 +401,44 @@ var popoverTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggl
 var popoverList = popoverTriggerList.map(function (popoverTriggerEl) {
     return new bootstrap.Popover(popoverTriggerEl)
 })
+
+// Controla os "modais de confirmação"
+// Intercepta qualquer elemento com data-confirm
+document.addEventListener("DOMContentLoaded", () => {
+
+    const confirmModalEl = document.getElementById("confirmModal");
+    const confirmModal = new bootstrap.Modal(confirmModalEl);
+    const confirmBtn = document.getElementById("confirmModalBtn");
+
+    let confirmCallback = null;
+
+    document.body.addEventListener("click", (event) => {
+
+        const trigger = event.target.closest("[data-confirm]");
+        if (!trigger) return;
+
+        event.preventDefault();
+
+        const title = trigger.dataset.confirmTitle || "Confirmação";
+        const message = trigger.dataset.confirmMessage || "Deseja continuar?";
+
+        confirmModalEl.querySelector(".modal-title").textContent = title;
+        confirmModalEl.querySelector(".modal-body").textContent = message;
+        confirmBtn.className = "btn " + (trigger.dataset.confirmBtnClass || "btn-primary");
+
+        confirmCallback = () => {
+            const actionName = trigger.dataset.confirmAction;
+            if (actionName && typeof window[actionName] === "function") { window[actionName](); return; }
+            if (trigger.tagName === "A") { window.location.href = trigger.href; }
+            else if (trigger.tagName === "FORM") { trigger.submit(); }
+        };
+
+        confirmModal.show();
+    });
+
+    confirmBtn.addEventListener("click", () => {
+        if (confirmCallback) confirmCallback();
+        confirmModal.hide();
+    });
+
+});
