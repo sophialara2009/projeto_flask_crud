@@ -121,8 +121,8 @@ def owner_logout():
 @login_required
 def owner_profile():
 
-    userdata = g.current_user
-    page_title = f"Perfil de {userdata['own_display_name']}"
+    userdata = dict(g.current_user)
+    page_title = f"Perfil de {userdata.get('own_display_name', 'Usuário')}"
 
     return render_template(
         "profile.html",
