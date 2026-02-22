@@ -10,7 +10,6 @@
  *  - Se vazio (''), faz logout do usuário
  *  - Se tem uma URL (Ex.: '/profile'), acessa
  */
-// const loggedUserAction = '';
 const loggedUserAction = '/owner/profile';
 
 /**
@@ -27,10 +26,7 @@ const userClickId = 'userInOutLink';
  *     - Somente a rota → /user/login ← Se o front-end está no mesmo domínio.
  *   DICA! Quando implementar seu back-end, não esqueça de implementar o endpoint abaixo usando o método POST.
  * - Se vazio (""), não envia os dados para a API/backend;
- * - Se "firebase", faz a persistência no projeto atual do Firebase Firestore, na coleção `Users`;
- */
-// const apiLoginEndpoint = 'firebase';
-// const apiLoginEndpoint = '/owner/login'; // Exemplo
+  */
 const apiLoginEndpoint = '/owner/login';
 
 /** 
@@ -42,7 +38,6 @@ const apiLoginEndpoint = '/owner/login';
  *     - Somente a rota → /user/logout ← Se o front-end está no mesmo domínio.
  * - Se vazio (""), não envia os dados para a API/backend;
  */
-// const apiLogoutEndpoint = '/user/logout'; // Exemplo
 const apiLogoutEndpoint = '/owner/logout';
 
 /**
@@ -50,8 +45,6 @@ const apiLogoutEndpoint = '/owner/logout';
  * Informa para onde o usuário será enviado após o logout
  * - Se vazio, não faz nada
  */
-// const redirectOnLogout = 'index.html'
-// const redirectOnLogout = ''
 const redirectOnLogout = '/'
 
 /**
@@ -133,6 +126,7 @@ const googleLogout = async () => {
     }
 };
 
+// Cria uma "function" googleLogout() no contexto "window"
 window.googleLogout = googleLogout;
 
 // Função de Manipulação de Clique (Login/Página de Perfil)
@@ -264,47 +258,6 @@ const sendUserToBackend = async (user) => {
 };
 
 /**
- * Função para persistir os dados no Firebase Firestore
- * Envia os dados do usuário logado para a API/backend via JSON.
- */
-const sendUserToFirestore = async (user) => {
-    try {
-        // Se a biblioteca Firestore não estiver carregada mostra erro
-        if (typeof firebase.firestore !== 'function') {
-            showLogs ? console.error("Firestore não está inicializado. Certifique-se de que a biblioteca Firestore (ex: firebase-firestore.js) foi carregada.") : null;
-            return;
-        }
-
-        // Inicializa o Firestore
-        const db = firebase.firestore();
-
-        // Referência ao documento do usuário (document ID = user.uid) na coleção 'Users'
-        const userDocRef = db.collection("Users").doc(user.uid);
-
-        // Dados a serem persistidos no Firestore
-        const userData = {
-            uid: user.uid,
-            displayName: user.displayName || null,
-            email: user.email || null,
-            photoURL: user.photoURL || null,
-            // Converte as datas para UTC/ISO ao enviar para o backend
-            createdAt: timestampToISO(user.metadata.createdAt) || null,
-            lastLoginAt: timestampToISO(user.metadata.lastLoginAt) || null,
-        };
-
-        // Cria ou atualiza o documento.
-        // { merge: true } garante que o documento seja atualizado se já existir,
-        // preservando outros campos não especificados em 'userData'.
-        await userDocRef.set(userData, { merge: true });
-
-        showLogs ? console.log('Dados do usuário persistidos com sucesso no Firestore (Coleção Users, Doc ID: ' + user.uid + ')') : null;
-
-    } catch (error) {
-        showLogs ? console.error('Erro ao persistir dados no Firestore:', error) : null;
-    }
-}
-
-/**
  * Converte um timestamp em milissegundos para o formato UTC 'YYYY-MM-DD HH:MM:SS'.
  * A data e hora retornadas representam o momento em UTC.
  * @param {number} timestamp_ms - O timestamp em milissegundos (ex: 1758895930030).
@@ -382,13 +335,8 @@ auth.onAuthStateChanged((user) => {
 
     // Se usuário fez login, envia dados para o backend
     if (user && apiLoginEndpoint != '') {
-        if (apiLoginEndpoint == 'firebase') {
-            showLogs ? console.log("Persistindo no Firebase.") : null;
-            sendUserToFirestore(user);
-        } else {
-            showLogs ? console.log("Persistindo na API.") : null;
-            sendUserToBackend(user);
-        }
+        showLogs ? console.log("Persistindo na API.") : null;
+        sendUserToBackend(user);
     } else {
         showLogs ? console.log("Persistência desligada!") : null;
     }
