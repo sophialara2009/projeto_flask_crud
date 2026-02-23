@@ -33,3 +33,4 @@ MAIL = {
     # Acesse https://myaccount.google.com/apppasswords para gerar a senha de aplicativo abaixo
     "password": "senha de aplicativo aqui",
 }
+ 
